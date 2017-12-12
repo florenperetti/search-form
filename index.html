@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscar</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+  <style>
+    #formbusqueda {
+        max-width: 600px;
+        margin: 0 auto;
+        font-family: "Raleway";
+    }
+
+    #formbusqueda .text-input {
+        font-size: 16px;
+    }
+
+    .twitter-typeahead {
+        position: unset !important;
+        display: unset !important;
+    }
+
+    .tt-query {
+      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+         -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+              box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    }
+
+    .tt-hint {
+      color: #999
+    }
+
+    .tt-menu {
+      width: 320px;
+      margin: 12px 0;
+      padding: 8px 0;
+      width: 100%;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      -webkit-border-radius: 8px;
+         -moz-border-radius: 8px;
+              border-radius: 8px;
+      -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+         -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+              box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    }
+
+    .tt-suggestion {
+      padding: 3px 20px;
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    .tt-suggestion:hover {
+      cursor: pointer;
+      color: #fff;
+      background-color: #0097cf;
+    }
+
+    .tt-suggestion.tt-cursor {
+      color: #fff;
+      background-color: #0097cf;
+
+    }
+
+    .tt-suggestion p {
+      margin: 0;
+    }
+
+    .gist {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+      <form id="formbusqueda">
+        <div class="form-row align-items-center">
+          <div class="col-auto">
+        <input type="text" class="text-input form-control mb-2 mb-sm-0" placeholder="Buscar" value=""><input type="hidden" class="input-id" value="" name="id">
+          </div>
+          <div class="col-auto">
+            <button value="" type="submit" class="search-button btn btn-primary">
+              <svg class="mk-svg-icon" data-name="mk-icon-search" data-cacheid="icon-5a2fd942b30cd" style="height:16px; width: 14,857142857143px; " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1664 1792">
+                <path d="M1152 832q0-185-131.5-316.5t-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5 316.5-131.5 131.5-316.5zm512 832q0 52-38 90t-90 38q-54 0-90-38l-343-342q-179 124-399 124-143 0-273.5-55.5t-225-150-150-225-55.5-273.5 55.5-273.5 150-225 225-150 273.5-55.5 273.5 55.5 225 150 150 225 55.5 273.5q0 220-124 399l343 343q37 37 37 90z">
+                </path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </form>
+  
+  <script
+    src="http://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.2.1/typeahead.bundle.min.js"></script>
+
+  <script>
+  (function($){
+    const $form = $("#formbusqueda");
+    const $input = $form.find('.text-input');
+    const $id = $form.find('.input-id');
+    const $submit = $form.find('.search-button');
+    const data = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      remote: {
+        wildcard: '%QUERY',
+        url: "https://gobiernoabierto.cordoba.gob.ar/api/actividad-publica/?format=json&q=%QUERY",
+        transform: datos => {
+          return $.map(datos.results, dato => {
+            return {
+                value: dato.titulo,
+                id: dato.id
+            };
+          });
+        }
+      }
+    });
+
+    $input.typeahead({
+        minLength: 3,
+        highlight: true,
+    }, {
+        displayKey: 'value',
+        display: 'value',
+        source: data
+    }).on("typeahead:selected typeahead:autocompleted", (e, dato) => {
+      $id.val(dato.id);
+    });
+    
+    $submit.click(function(e) {
+      e.preventDefault();
+    });
+  })(jQuery);
+  </script>
+</body>
+</html>
